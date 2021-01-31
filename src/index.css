@@ -1,5 +1,5 @@
 body {
-  margin: 0;
+  margin: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -11,3 +11,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.square {
+  background: rgb(255, 255, 255);
+  border: 1px solid #999;
+  float: left;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  width: 34px;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.start-square {
+  background: rgb(97, 255, 176);
+}
+
+.end-square {
+  background: rgb(255, 128, 128);
+}
+
+.square.visited{
+  background: rgb(88, 88, 88)
+}
+
+.square.blockade{
+  background-color: black;
+}
+
+
