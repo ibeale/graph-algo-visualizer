@@ -10,6 +10,7 @@ interface AppState{
     adjMatrix: number[][],
     points: Point[],
     path: Point[],
+    visited: Point[],
     blockades: Point[],
     solver?: SolverBase
 }
@@ -21,17 +22,22 @@ enum SolverTypes{
 interface AppProps{
 
 }
+
+function sleep(ms : number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 export class App extends React.Component<AppProps, AppState>{
  
     constructor(props : AppProps){
         super(props);
         let newMatrix : number[][] = [];
         this.state = {
-            boardH: 20,
+            boardH: 3,
             startPt: new Point(0,0),
-            endPt: new Point (19,19),
+            endPt: new Point (2,2),
             adjMatrix: [],
             points: [],
+            visited: [],
             blockades: [],
             path: []
         }
@@ -58,6 +64,7 @@ export class App extends React.Component<AppProps, AppState>{
             endPt: this.state.endPt,
             adjMatrix: newMatrix,
             points: this.state.points,
+            visited: this.state.visited,
             blockades: [],
             path: []
         }
@@ -78,7 +85,7 @@ export class App extends React.Component<AppProps, AppState>{
                 )
                 this.state.points.forEach(({x, y} : Point, i) => {
                     let distance = Math.abs(point.x - x) + Math.abs(point.y - y)
-                    if(distance <= 1){
+                    if(distance <= 1 && newMatrix[i][i] !== Infinity){
                         newMatrix[i][adjMatIdx] = distance
                         newMatrix[adjMatIdx][i] = distance
                     }
@@ -115,19 +122,30 @@ export class App extends React.Component<AppProps, AppState>{
         }
     }
 
-    solveShortestPath = () => {
+    solveShortestPath = async () => {
+        this.clearPath();
         this.setSolver(SolverTypes.Dijkstra);
         if(this.state.solver != null){
-            let newPath = this.state.solver.solve(this.state.startPt, this.state.endPt, this.state.adjMatrix, this.state.points)
+            let results = this.state.solver.solve(this.state.startPt, this.state.endPt, this.state.adjMatrix, this.state.points)
+            let displayedVisited : Point[] = [];
+            for(let i = 0; i < results.visited.length; i++){
+                displayedVisited.push(results.visited[i]);
+                this.setState({
+                    visited: displayedVisited
+                })
+                await sleep(10);
+            }
             this.setState({
-                path: newPath
+                path: results.path,
+                visited: results.visited
             })
         }
     }
 
     clearPath = () => {
         this.setState({
-            path: []
+            path: [],
+            visited: []
         })
     }
 
@@ -136,7 +154,6 @@ export class App extends React.Component<AppProps, AppState>{
     }  
 
     render(){
-        console.log(this.state.blockades)
         return(
             
             <div>
@@ -147,6 +164,7 @@ export class App extends React.Component<AppProps, AppState>{
                 end={this.state.endPt}
                 addBlockadeCallback={(points:Point[]) => this.toggleBlockadesInMatrix(points)}
                 path={this.state.path}
+                visited={this.state.visited}
                 blockades={this.state.blockades}/>
                 <button onClick={this.clearPath}>Clear Path</button>
                 <button onClick={this.clearBlockades}>Clear Blockades</button>

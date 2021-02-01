@@ -1,5 +1,5 @@
 import React from 'react';
-import {Square, SquareProps, StartSquareProps, EndSquareProps, BlockadeSquareProps, PlainSquareProps, PathSquareProps} from './Square'
+import {Square, SquareProps, StartSquareProps, EndSquareProps, BlockadeSquareProps, PlainSquareProps, PathSquareProps, VisitedSquareProps} from './Square'
 
 export class Point{
     x: number;
@@ -16,6 +16,7 @@ export interface BoardProps{
     start?: Point,
     end?: Point,
     path: Point[],
+    visited: Point[],
     blockades: Point[],
     addBlockadeCallback: (points: Point[]) => void
 }
@@ -56,6 +57,10 @@ export class Board extends React.Component<BoardProps, State>{
         this.props.blockades.forEach(({x,y}) => {
             this.squares[x][y] = new BlockadeSquareProps((() => this.addBlockade({x,y}, undefined)));
 
+        })
+
+        this.props.visited.forEach(({x,y}) => {
+            this.squares[x][y] = new VisitedSquareProps();
         })
 
         this.props.path.forEach(({x,y}) => {

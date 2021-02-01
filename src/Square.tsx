@@ -34,6 +34,12 @@ export class EndSquareProps implements SquareProps{
 export class PathSquareProps implements SquareProps {
     visited= true;
     visitable= false;
+    className="path";
+}
+
+export class VisitedSquareProps implements SquareProps {
+    visited= true;
+    visitable= false;
     className="visited";
 }
 

@@ -44,8 +44,12 @@ code {
   background: rgb(255, 128, 128);
 }
 
-.square.visited{
+.square.path{
   background: rgb(88, 88, 88)
+}
+
+.square.visited{
+  background: rgb(214, 152, 255)
 }
 
 .square.blockade{
