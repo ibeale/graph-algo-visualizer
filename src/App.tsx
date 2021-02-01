@@ -32,9 +32,9 @@ export class App extends React.Component<AppProps, AppState>{
         super(props);
         let newMatrix : number[][] = [];
         this.state = {
-            boardH: 3,
+            boardH: 20,
             startPt: new Point(0,0),
-            endPt: new Point (2,2),
+            endPt: new Point (19,19),
             adjMatrix: [],
             points: [],
             visited: [],
@@ -169,6 +169,10 @@ export class App extends React.Component<AppProps, AppState>{
                 <button onClick={this.clearPath}>Clear Path</button>
                 <button onClick={this.clearBlockades}>Clear Blockades</button>
                 <button onClick={this.solveShortestPath}>Solve</button>
+                <select>
+                    <option></option>
+                    <option onClick={() => this.setSolver(SolverTypes.Dijkstra)}>Dijkstra</option>
+                </select>
             </div>
             )
         }
