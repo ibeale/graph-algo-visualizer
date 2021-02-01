@@ -63,20 +63,20 @@ export class App extends React.Component<AppProps, AppState>{
         }
     }
 
-    addBlockadeToMatrix(point: Point){
+    toggleBlockadeInMatrix(point: Point){
 
         let newMatrix = this.state.adjMatrix.slice();
         let adjMatIdx = this.state.boardH * point.y + point.x;
         let newBlockades : Point[];
-        if(this.state.blockades.find(({x,y}) => 
+        if(this.state.blockades.find(({x,y} : Point) => 
             (x === point.x && y === point.y)
         )){
             console.log(`removing blockade at x: ${point.x}, y: ${point.y}`)
             newBlockades = this.state.blockades.slice();
-            newBlockades = newBlockades.filter(({x,y}) => 
-                (x !== point.x && y !== point.y)
+            newBlockades = newBlockades.filter(({x,y} : Point) => 
+                !(x === point.x && y === point.y)
             )
-            this.state.points.forEach(({x, y}, i) => {
+            this.state.points.forEach(({x, y} : Point, i) => {
                 let distance = Math.abs(point.x - x) + Math.abs(point.y - y)
                 if(distance <= 1){
                     newMatrix[i][adjMatIdx] = distance
@@ -101,6 +101,7 @@ export class App extends React.Component<AppProps, AppState>{
             adjMatrix: newMatrix,
             blockades: newBlockades
         })
+        
     }
 
     setSolver(solverType: SolverTypes){
@@ -130,11 +131,12 @@ export class App extends React.Component<AppProps, AppState>{
 
     clearBlockades = () => {
         this.state.blockades.forEach(point => {
-            this.addBlockadeToMatrix(point);
+            this.toggleBlockadeInMatrix(point);
         })
     }  
 
     render(){
+        console.log(this.state.blockades)
         return(
             
             <div>
@@ -143,7 +145,7 @@ export class App extends React.Component<AppProps, AppState>{
                 width={this.state.boardH}
                 start={this.state.startPt}
                 end={this.state.endPt}
-                addBlockadeCallback={(point:Point) => this.addBlockadeToMatrix(point)}
+                addBlockadeCallback={(point:Point) => this.toggleBlockadeInMatrix(point)}
                 path={this.state.path}
                 blockades={this.state.blockades}/>
                 <button onClick={this.clearPath}>Clear Path</button>
@@ -151,5 +153,5 @@ export class App extends React.Component<AppProps, AppState>{
                 <button onClick={this.solveShortestPath}>Solve</button>
             </div>
             )
+        }
     }
-}
