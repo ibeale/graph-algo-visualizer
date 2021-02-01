@@ -10,12 +10,13 @@ export class Point{
     }
 }
 
-interface Props{
+export interface BoardProps{
     height: number,
     width: number,
     start?: Point,
     end?: Point,
     path: Point[],
+    blockades: Point[],
     addBlockadeCallback: (point: Point) => void
 }
 
@@ -24,59 +25,48 @@ interface State{
 }
 
 
-export class Board extends React.Component<Props, State>{
-    constructor(props:Props){
-        super(props);
-        this.state = {
-            squares: []
-        }
-        for(let i = 0; i < props.height; i++){
-            this.state.squares.push([]);
-            for(let j = 0; j < props.width; j++){
-                if(this.props.start !== undefined && i === this.props.start.x && j === this.props.start.y){
-                    this.state.squares[i].push(new StartSquareProps());
-                }
-                else if(this.props.end !== undefined && i === this.props.end.x && j === this.props.end.y){
-                    this.state.squares[i].push(new EndSquareProps());
-                }
-                else{
-                    let onClick = (() => this.addBlockade(new Point(i,j), undefined));
-                    this.state.squares[i].push(new PlainSquareProps(onClick));
-                }
-            }
-        }
-        let newSquares = this.state.squares.slice();
-        this.props.path.forEach(({x,y}) => {
-            newSquares[x][y] = new PathSquareProps();
-        })
-        this.setState({
-            squares: newSquares
-        })
+export class Board extends React.Component<BoardProps, State>{
+    squares : (SquareProps)[][] = []
+
+    updatePath(){
+        
     }
 
     addBlockade(point : Point, event?: React.MouseEvent<HTMLDivElement>) {
-
-        let newSquares = this.state.squares.slice(); 
-        if( newSquares[point.x][point.y] instanceof BlockadeSquareProps){
-            newSquares[point.x][point.y] = new PlainSquareProps((() => this.addBlockade(point, undefined)));
-        }
-        else{
-            newSquares[point.x][point.y] = new BlockadeSquareProps((() => this.addBlockade(point, undefined)));
-        }
         this.props.addBlockadeCallback(point);
-        this.setState({
-            squares: newSquares,
-        })
     }
 
     render(){
+        this.squares = []
+        for(let i = 0; i < this.props.height; i++){
+            this.squares.push([]);
+            for(let j = 0; j < this.props.width; j++){
+                if(this.props.start !== undefined && i === this.props.start.x && j === this.props.start.y){
+                    this.squares[i].push(new StartSquareProps());
+                }
+                else if(this.props.end !== undefined && i === this.props.end.x && j === this.props.end.y){
+                    this.squares[i].push(new EndSquareProps());
+                }
+                else{
+                    let onClick = (() => this.addBlockade(new Point(i,j), undefined));
+                    this.squares[i].push(new PlainSquareProps(onClick));
+                }
+            }
+        }
+        this.props.blockades.forEach(({x,y}) => {
+            this.squares[x][y] = new BlockadeSquareProps((() => this.addBlockade({x,y}, undefined)));
+
+        })
+
+        this.props.path.forEach(({x,y}) => {
+            this.squares[x][y] = new PathSquareProps();
+        })
         let grid : JSX.Element[] = [];
         for(let i = 0; i < this.props.height; i++){
             let row = [];
             for(let j = 0; j < this.props.width; j++){
-                let square = Square(this.state.squares[i][j], i+this.props.width*j);
+                let square = Square(this.squares[i][j], i+this.props.width*j);
                 row.push(square);
-
             }
             grid.push(<div key={i} className="board-row">{row}</div>);
 
