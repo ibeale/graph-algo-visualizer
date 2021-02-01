@@ -17,7 +17,7 @@ export interface BoardProps{
     end?: Point,
     path: Point[],
     blockades: Point[],
-    addBlockadeCallback: (point: Point) => void
+    addBlockadeCallback: (points: Point[]) => void
 }
 
 interface State{
@@ -33,7 +33,7 @@ export class Board extends React.Component<BoardProps, State>{
     }
 
     addBlockade(point : Point, event?: React.MouseEvent<HTMLDivElement>) {
-        this.props.addBlockadeCallback(point);
+        this.props.addBlockadeCallback([point]);
     }
 
     render(){

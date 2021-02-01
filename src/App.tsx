@@ -63,40 +63,42 @@ export class App extends React.Component<AppProps, AppState>{
         }
     }
 
-    toggleBlockadeInMatrix(point: Point){
+    toggleBlockadesInMatrix(points: Point[]){
 
         let newMatrix = this.state.adjMatrix.slice();
-        let adjMatIdx = this.state.boardH * point.y + point.x;
-        let newBlockades : Point[];
-        if(this.state.blockades.find(({x,y} : Point) => 
-            (x === point.x && y === point.y)
-        )){
-            console.log(`removing blockade at x: ${point.x}, y: ${point.y}`)
-            newBlockades = this.state.blockades.slice();
-            newBlockades = newBlockades.filter(({x,y} : Point) => 
-                !(x === point.x && y === point.y)
-            )
-            this.state.points.forEach(({x, y} : Point, i) => {
-                let distance = Math.abs(point.x - x) + Math.abs(point.y - y)
-                if(distance <= 1){
-                    newMatrix[i][adjMatIdx] = distance
-                    newMatrix[adjMatIdx][i] = distance
-                }
-                else{
-                    newMatrix[i][adjMatIdx] = Infinity
-                    newMatrix[adjMatIdx][i] = Infinity
-                }
-            })
-        }
-        else{
-            console.log(`adding blockade at x: ${point.x}, y: ${point.y}`)
-            newBlockades = this.state.blockades.slice();
-            newBlockades.push(point);
-            for(let i = 0; i < newMatrix.length; i++){
-                newMatrix[i][adjMatIdx] = Infinity;
-                newMatrix[adjMatIdx][i] = Infinity;
+        let newBlockades : Point[] = this.state.blockades.slice();;
+        points.forEach(point => {
+            let adjMatIdx = this.state.boardH * point.y + point.x;
+            if(this.state.blockades.find(({x,y} : Point) => 
+                (x === point.x && y === point.y)
+            )){
+                console.log(`removing blockade at x: ${point.x}, y: ${point.y}`)
+                newBlockades = newBlockades.filter(({x,y} : Point) => 
+                    !(x === point.x && y === point.y)
+                )
+                this.state.points.forEach(({x, y} : Point, i) => {
+                    let distance = Math.abs(point.x - x) + Math.abs(point.y - y)
+                    if(distance <= 1){
+                        newMatrix[i][adjMatIdx] = distance
+                        newMatrix[adjMatIdx][i] = distance
+                    }
+                    else{
+                        newMatrix[i][adjMatIdx] = Infinity
+                        newMatrix[adjMatIdx][i] = Infinity
+                    }
+                })
             }
-        }
+            else{
+                console.log(`adding blockade at x: ${point.x}, y: ${point.y}`)
+                newBlockades = this.state.blockades.slice();
+                newBlockades.push(point);
+                for(let i = 0; i < newMatrix.length; i++){
+                    newMatrix[i][adjMatIdx] = Infinity;
+                    newMatrix[adjMatIdx][i] = Infinity;
+                }
+            }
+        })
+
         this.setState({
             adjMatrix: newMatrix,
             blockades: newBlockades
@@ -130,9 +132,7 @@ export class App extends React.Component<AppProps, AppState>{
     }
 
     clearBlockades = () => {
-        this.state.blockades.forEach(point => {
-            this.toggleBlockadeInMatrix(point);
-        })
+        this.toggleBlockadesInMatrix(this.state.blockades);
     }  
 
     render(){
@@ -145,7 +145,7 @@ export class App extends React.Component<AppProps, AppState>{
                 width={this.state.boardH}
                 start={this.state.startPt}
                 end={this.state.endPt}
-                addBlockadeCallback={(point:Point) => this.toggleBlockadeInMatrix(point)}
+                addBlockadeCallback={(points:Point[]) => this.toggleBlockadesInMatrix(points)}
                 path={this.state.path}
                 blockades={this.state.blockades}/>
                 <button onClick={this.clearPath}>Clear Path</button>
